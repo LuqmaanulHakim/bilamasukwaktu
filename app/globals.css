@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f7fb;
+  --background-start: #dbeafe;
+  --background-end: #f8fafc;
   --foreground: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --muted: #6b7280;
+}
+
+[data-theme="dark"] {
+  --background-start: #0f172a;
+  --background-end: #1e293b;
+  --foreground: #f1f5f9;
+  --card-bg: #1e293b;
+  --card-border: #334155;
+  --muted: #94a3b8;
 }
 
 html,
@@ -10,13 +23,10 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  background: linear-gradient(
-    to bottom,
-    #dbeafe,
-    #f8fafc
-  );
+  background: linear-gradient(to bottom, var(--background-start), var(--background-end));
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 * {
