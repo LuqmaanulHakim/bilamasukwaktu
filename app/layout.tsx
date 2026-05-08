@@ -11,6 +11,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: "Waktu Solat",
   description: "Prayer times for Malaysia",
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
