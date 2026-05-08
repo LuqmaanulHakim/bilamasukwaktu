@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "../context/ThemeContext";
 
 const tabs = [
   {
     href: "/",
-    label: "Home",
+    label: "Utama",
     icon: (active: boolean) => (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +27,7 @@ const tabs = [
   },
   {
     href: "/settings",
-    label: "Settings",
+    label: "Tetapan",
     icon: (active: boolean) => (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -53,9 +54,17 @@ const tabs = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-t border-gray-100 shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
+    <nav 
+      className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md border-t shadow-[0_-4px_24px_rgba(0,0,0,0.06)] transition-colors duration-200 ${
+        isDark 
+          ? "bg-gray-900/90 border-gray-800" 
+          : "bg-white/90 border-gray-100"
+      }`}
+    >
       <div className="max-w-md mx-auto flex">
         {tabs.map((tab) => {
           const active = pathname === tab.href;
@@ -65,20 +74,28 @@ export default function BottomNav() {
               href={tab.href}
               className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-colors duration-200 ${
                 active
-                  ? "text-indigo-600"
-                  : "text-gray-400 hover:text-gray-600"
+                  ? isDark ? "text-blue-400" : "text-indigo-600"
+                  : isDark 
+                    ? "text-gray-500 hover:text-gray-300" 
+                    : "text-gray-400 hover:text-gray-600"
               }`}
             >
               {tab.icon(active)}
               <span
-                className={`text-[11px] font-semibold tracking-wide ${
-                  active ? "text-indigo-600" : "text-gray-400"
+                className={`text-[11px] font-semibold tracking-wide transition-colors duration-200 ${
+                  active
+                    ? isDark ? "text-blue-400" : "text-indigo-600"
+                    : isDark ? "text-gray-500" : "text-gray-400"
                 }`}
               >
                 {tab.label}
               </span>
               {active && (
-                <span className="absolute bottom-0 w-10 h-0.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600" />
+                <span className={`absolute bottom-0 w-10 h-0.5 rounded-full bg-gradient-to-r ${
+                  isDark 
+                    ? "from-blue-400 to-indigo-400" 
+                    : "from-blue-500 to-indigo-600"
+                }`} />
               )}
             </Link>
           );

@@ -29,7 +29,7 @@ export default function Home() {
     <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
       {/* HERO */}
       <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-3xl p-6 shadow-xl">
-        <p className="text-sm opacity-80">Today's Prayer Times</p>
+        <p className="text-sm opacity-80">Waktu Solat bagi</p>
         <h1 className="text-2xl font-bold mt-1">{selectedZone?.negeri}</h1>
         <p className="mt-1 text-sm opacity-80">
           {selectedZone?.daerah || "Prayer Times"}

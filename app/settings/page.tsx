@@ -16,9 +16,8 @@ export default function SettingsPage() {
     <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
       {/* HEADER */}
       <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-3xl p-6 shadow-xl">
-        <p className="text-sm opacity-80">Preferences</p>
-        <h1 className="text-2xl font-bold mt-1">Settings</h1>
-        <p className="mt-1 text-sm opacity-80">Customise your prayer time zone</p>
+        <h1 className="text-2xl font-bold mt-1">Tetapan</h1>
+        <p className="mt-1 text-sm opacity-80">Sesuaikan mengikut tetapan anda</p>
       </section>
 
       {/* ZONE SELECTOR */}
@@ -45,16 +44,25 @@ export default function SettingsPage() {
           </div>
           <div>
             <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-              Prayer Zone
+              Zon Kawasan
             </p>
             <p className="text-xs" style={{ color: "var(--muted)" }}>
-              Select your JAKIM zone
+              Pilih zon anda
             </p>
           </div>
         </div>
 
         {zonesLoading ? (
-          <p className="text-sm" style={{ color: "var(--muted)" }}>Loading zones...</p>
+          <div className="relative w-full">
+            {/* Skeleton button */}
+            <div className="w-full px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm border">
+              <div className="flex flex-col items-start gap-1">
+                <div className="h-4 w-24 rounded animate-pulse" style={{ background: "var(--card-border)" }} />
+                <div className="h-3 w-32 rounded animate-pulse" style={{ background: "var(--card-border)" }} />
+              </div>
+              <div className="h-3 w-3 rounded animate-pulse" style={{ background: "var(--card-border)" }} />
+            </div>
+          </div>
         ) : (
           <ZoneSelector zones={zones} value={zone} onChange={setZone} />
         )}
@@ -78,10 +86,10 @@ export default function SettingsPage() {
           </div>
           <div>
             <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-              Appearance
+              Mod tatapan
             </p>
             <p className="text-xs" style={{ color: "var(--muted)" }}>
-              Choose your display theme
+              Pilih antara mod gelap atau terang
             </p>
           </div>
         </div>
