@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 const STORAGE_KEY = "selectedZone";
-const DEFAULT_ZONE = "JHR01";
+const DEFAULT_ZONE = "WLY01";
 
 export function useSelectedZone() {
   const [zone, setZoneState] = useState<string>(DEFAULT_ZONE);

@@ -15,7 +15,7 @@ export default function SettingsPage() {
   return (
     <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
       {/* HEADER */}
-      <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-3xl p-6 shadow-xl">
+      <section>
         <h1 className="text-2xl font-bold mt-1">Tetapan</h1>
         <p className="mt-1 text-sm opacity-80">Sesuaikan mengikut tetapan anda</p>
       </section>
@@ -86,7 +86,7 @@ export default function SettingsPage() {
           </div>
           <div>
             <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-              Mod tatapan
+              Mod Tatapan
             </p>
             <p className="text-xs" style={{ color: "var(--muted)" }}>
               Pilih antara mod gelap atau terang
@@ -97,10 +97,10 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
-              Dark Mode
+              Mod Gelap
             </p>
             <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-              {isDark ? "On — easy on the eyes" : "Off — using light theme"}
+              {isDark ? "Buka" : "Tutup"}
             </p>
           </div>
 
