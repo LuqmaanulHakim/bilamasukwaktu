@@ -7,7 +7,6 @@ import { useWaktuSolat } from "./hooks/useWaktuSolat";
 import { useSelectedZone } from "./hooks/useSelectedZone";
 import { useTheme } from "./context/ThemeContext";
 
-// Simple helper function using Malay locale
 const getMalayDate = (date: Date) => {
   return date.toLocaleDateString("ms-MY", {
     weekday: "long",
@@ -17,7 +16,6 @@ const getMalayDate = (date: Date) => {
   });
 };
 
-// Skeleton components
 const HeroSkeleton = () => (
   <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-3xl p-6 shadow-xl">
     <div className="animate-pulse">
@@ -32,13 +30,13 @@ const HeroSkeleton = () => (
 const SunTimelineSkeleton = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  
+
   return (
-    <div 
+    <div
       className="rounded-3xl p-6 shadow-sm border animate-pulse"
-      style={{ 
-        background: "var(--card-bg)", 
-        borderColor: "var(--card-border)" 
+      style={{
+        background: "var(--card-bg)",
+        borderColor: "var(--card-border)",
       }}
     >
       <div className="mb-4">
@@ -65,9 +63,9 @@ const SunTimelineSkeleton = () => {
 const PrayerTimesGridSkeleton = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  
+
   return (
-    <div 
+    <div
       className="backdrop-blur-lg rounded-3xl border shadow p-2 animate-pulse"
       style={{
         background: isDark ? "rgba(30,41,59,0.7)" : "rgba(255,255,255,0.7)",
@@ -95,9 +93,8 @@ const PrayerTimesGridSkeleton = () => {
 export default function Home() {
   const { zones, loading: zonesLoading } = useZones();
   const { zone } = useSelectedZone();
-  const { data, error } = useWaktuSolat(zone);
+  const { data, error } = useWaktuSolat(zone); // still used by SunTimeline only
 
-  // Show skeleton loading while zones are loading
   if (zonesLoading) {
     return (
       <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
@@ -113,8 +110,8 @@ export default function Home() {
       <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4">
         <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
           <p className="text-red-600">Error loading prayer times</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg text-sm"
           >
             Try Again
@@ -154,7 +151,7 @@ export default function Home() {
       <SunTimeline data={data as any} />
 
       {/* PRAYER TIMES */}
-      <PrayerTimesGrid data={data as any} />
+      <PrayerTimesGrid zone={zone} />
     </main>
   );
 }
