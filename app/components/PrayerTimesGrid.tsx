@@ -100,7 +100,7 @@ export default function PrayerTimesGrid({ zone }: Props) {
             style={{ color: "var(--muted)" }}
           >
             {index === 0
-              ? "Hari Ini"
+              ? "Hari ini"
               : DAY_MY[displayed?.day ?? ""] ?? displayed?.day}
           </p>
 
