@@ -96,7 +96,7 @@ export default function PrayerTimesGrid({ zone }: Props) {
         {/* Left */}
         <div>
           <p
-            className="text-xs font-medium tracking-widest"
+            className="text-xs font-medium tracking-wide"
             style={{ color: "var(--muted)" }}
           >
             {index === 0
@@ -155,11 +155,11 @@ export default function PrayerTimesGrid({ zone }: Props) {
       </div>
 
       {/* Prayer Times */}
-      <div className="grid grid-cols-6 gap-1.5 text-center">
+      <div className="grid grid-cols-3 gap-3 text-center">
         {PRAYERS.map(({ key, label }) => (
           <div
             key={key}
-            className="rounded-xl py-2 px-1"
+            className="rounded-2xl py-3"
             style={{
               background: isDark
                 ? "rgba(51,65,85,0.4)"
@@ -167,14 +167,14 @@ export default function PrayerTimesGrid({ zone }: Props) {
             }}
           >
             <p
-              className="text-[10px]"
+              className="text-xs"
               style={{ color: "var(--muted)" }}
             >
               {label}
             </p>
 
             <p
-              className="font-semibold text-[13px] mt-0.5"
+              className="font-semibold text-base mt-1"
               style={{ color: "var(--foreground)" }}
             >
               {displayed?.[key]?.slice(0, 5) ?? "--:--"}
