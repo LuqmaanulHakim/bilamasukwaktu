@@ -16,9 +16,17 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 function syncThemeColor(theme: Theme) {
   const color = theme === "dark" ? "#0f172a" : "#dbeafe";
-  document
-    .querySelector('meta[name="theme-color"]')
-    ?.setAttribute("content", color);
+  
+  let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  
+  // Create it if it doesn't exist yet
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = "theme-color";
+    document.head.appendChild(meta);
+  }
+  
+  meta.setAttribute("content", color);
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
