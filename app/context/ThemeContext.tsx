@@ -14,10 +14,16 @@ const ThemeContext = createContext<ThemeContextValue>({
   toggleTheme: () => {},
 });
 
+function syncThemeColor(theme: Theme) {
+  const color = theme === "dark" ? "#0f172a" : "#dbeafe";
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", color);
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
 
-  // Load from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem("theme") as Theme | null;
     const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -26,6 +32,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const initial = stored ?? preferred;
     setTheme(initial);
     document.documentElement.setAttribute("data-theme", initial);
+    syncThemeColor(initial);
   }, []);
 
   const toggleTheme = () => {
@@ -33,6 +40,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const next = prev === "light" ? "dark" : "light";
       localStorage.setItem("theme", next);
       document.documentElement.setAttribute("data-theme", next);
+      syncThemeColor(next);
       return next;
     });
   };
