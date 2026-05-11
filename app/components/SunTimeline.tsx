@@ -174,7 +174,7 @@ export default function SunTimeline({ data }: { data: Prayer }) {
 
   return (
     <div
-      className="rounded-3xl p-6 shadow-sm border"
+      className="rounded-3xl p-4 shadow-sm border"
       style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
     >
       <div className="mb-4">
@@ -283,21 +283,6 @@ export default function SunTimeline({ data }: { data: Prayer }) {
             style={{ filter: `drop-shadow(0 0 5px ${sunGlow})` }}
           />
         </svg>
-      </div>
-
-      <div className="flex justify-between mt-3 text-sm">
-        <div>
-          <p style={{ color: "var(--muted)" }}>Syuruk</p>
-          <p className="font-medium" style={{ color: "var(--foreground)" }}>
-            {formatTimeWithoutSeconds(data.syuruk)}
-          </p>
-        </div>
-        <div className="text-right">
-          <p style={{ color: "var(--muted)" }}>Maghrib</p>
-          <p className="font-medium" style={{ color: "var(--foreground)" }}>
-            {formatTimeWithoutSeconds(data.maghrib)}
-          </p>
-        </div>
       </div>
     </div>
   );
