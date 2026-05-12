@@ -23,10 +23,20 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  background: linear-gradient(to bottom, var(--background-start), var(--background-end));
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Give html a solid dark/light bg to cover status bar & overscroll */
+html {
+  background: var(--background-start);
+}
+
+/* Body gets the gradient */
+body {
+  background: linear-gradient(to bottom, var(--background-start), var(--background-end));
+  min-height: 100dvh;
 }
 
 * {
