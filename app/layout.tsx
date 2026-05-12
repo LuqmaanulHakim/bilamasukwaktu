@@ -11,6 +11,10 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: "Waktu Solat",
   description: "Prayer times for Malaysia",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+    { media: "(prefers-color-scheme: light)", color: "#dbeafe" },
+  ],
 };
 
 export const viewport: Viewport = {
