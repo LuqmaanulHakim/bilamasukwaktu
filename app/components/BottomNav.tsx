@@ -83,12 +83,12 @@ export default function BottomNav() {
   const isDark = theme === "dark";
 
   return (
-    <nav 
-      className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md border-t shadow-[0_-4px_24px_rgba(0,0,0,0.06)] transition-colors duration-200 ${
-        isDark 
-          ? "bg-gray-900/90 border-gray-800" 
-          : "bg-white/90 border-gray-100"
-      }`}
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md border-t shadow-[0_-4px_24px_rgba(0,0,0,0.06)] transition-colors duration-200"
+      style={{
+        background: isDark ? "rgba(15,23,42,0.90)" : "rgba(255,255,255,0.90)",
+        borderColor: "var(--card-border)",
+      }}
     >
       <div className="max-w-md mx-auto flex">
         {tabs.map((tab) => {
@@ -97,30 +97,23 @@ export default function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-colors duration-200 ${
-                active
-                  ? isDark ? "text-blue-400" : "text-indigo-600"
-                  : isDark 
-                    ? "text-gray-500 hover:text-gray-300" 
-                    : "text-gray-400 hover:text-gray-600"
-              }`}
+              className="flex-1 relative flex flex-col items-center justify-center gap-1 py-3 transition-colors duration-200"
+              style={{ color: active ? "var(--accent)" : "var(--muted)" }}
             >
               {tab.icon(active)}
               <span
-                className={`text-[11px] font-semibold tracking-wide transition-colors duration-200 ${
-                  active
-                    ? isDark ? "text-blue-400" : "text-indigo-600"
-                    : isDark ? "text-gray-500" : "text-gray-400"
-                }`}
+                className="text-[11px] font-semibold tracking-wide transition-colors duration-200"
+                style={{ color: active ? "var(--accent)" : "var(--muted)" }}
               >
                 {tab.label}
               </span>
+
+              {/* Active indicator bar */}
               {active && (
-                <span className={`absolute bottom-0 w-10 h-0.5 rounded-full bg-gradient-to-r ${
-                  isDark 
-                    ? "from-blue-400 to-indigo-400" 
-                    : "from-blue-500 to-indigo-600"
-                }`} />
+                <span
+                  className="absolute bottom-0 w-10 h-0.5 rounded-full"
+                  style={{ background: "var(--accent)" }}
+                />
               )}
             </Link>
           );

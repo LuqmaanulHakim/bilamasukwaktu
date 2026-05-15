@@ -1,21 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background-start: #dbeafe;
-  --background-end: #f8fafc;
   --foreground: #0f172a;
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
   --muted: #6b7280;
+
+  --accent: #6366f1;
+  --accent-subtle: #6366f118;
+  --accent-border: #6366f140;
+
+  /* Tinted bg — JS overrides these via applyAccent() */
+  --background-tint-start: #dbeafe;
+  --background-tint-end: #f8fafc;
 }
 
 [data-theme="dark"] {
-  --background-start: #0f172a;
-  --background-end: #1e293b;
   --foreground: #f1f5f9;
   --card-bg: #1e293b;
   --card-border: #334155;
   --muted: #94a3b8;
+
+  --accent: #818cf8;
+  --accent-subtle: #818cf822;
+  --accent-border: #818cf855;
+
+  --background-tint-start: #0f172a;
+  --background-tint-end: #1e293b;
 }
 
 html,
@@ -25,17 +36,15 @@ body {
   min-height: 100%;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: background 0.4s ease, color 0.3s ease;
 }
 
-/* Give html a solid dark/light bg to cover status bar & overscroll */
 html {
-  background: var(--background-start);
+  background: var(--background-tint-start);
 }
 
-/* Body gets the gradient */
 body {
-  background: linear-gradient(to bottom, var(--background-start), var(--background-end));
+  background: linear-gradient(to bottom, var(--background-tint-start), var(--background-tint-end));
   min-height: 100dvh;
 }
 

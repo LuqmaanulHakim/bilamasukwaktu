@@ -17,7 +17,10 @@ const getMalayDate = (date: Date) => {
 };
 
 const HeroSkeleton = () => (
-  <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-3xl p-6 shadow-xl">
+  <section
+    className="text-white rounded-3xl p-6 shadow-xl"
+    style={{ background: "linear-gradient(to bottom right, var(--accent), var(--accent)dd)" }}
+  >
     <div className="animate-pulse">
       <div className="h-3 w-24 bg-white/30 rounded mb-2"></div>
       <div className="h-8 w-40 bg-white/30 rounded mt-1"></div>
@@ -93,7 +96,7 @@ const PrayerTimesGridSkeleton = () => {
 export default function Home() {
   const { zones, loading: zonesLoading } = useZones();
   const { zone } = useSelectedZone();
-  const { data, error } = useWaktuSolat(zone); // still used by SunTimeline only
+  const { data, error } = useWaktuSolat(zone);
 
   if (zonesLoading) {
     return (
@@ -108,11 +111,18 @@ export default function Home() {
   if (error) {
     return (
       <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4">
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
-          <p className="text-red-600">Error loading prayer times</p>
+        <div
+          className="rounded-2xl p-6 text-center border"
+          style={{
+            background: "var(--accent-subtle)",
+            borderColor: "var(--accent-border)",
+          }}
+        >
+          <p style={{ color: "var(--accent)" }}>Error loading prayer times</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg text-sm"
+            className="mt-3 px-4 py-2 text-white rounded-lg text-sm"
+            style={{ background: "var(--accent)" }}
           >
             Try Again
           </button>
@@ -136,7 +146,12 @@ export default function Home() {
   return (
     <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
       {/* HERO */}
-      <section className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-3xl p-4 shadow-xl">
+      <section
+        className="text-white rounded-3xl p-4 shadow-xl"
+        style={{
+          background: "linear-gradient(to bottom right, var(--accent), color-mix(in srgb, var(--accent) 70%, black))",
+        }}
+      >
         <h1 className="text-2xl font-bold mt-1">{selectedZone?.negeri}</h1>
         <p className="mt-1 text-sm opacity-80">
           {selectedZone?.daerah || "Prayer Times"}

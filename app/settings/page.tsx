@@ -6,11 +6,13 @@ import { useSelectedZone } from "../hooks/useSelectedZone";
 import { useGpsZone } from "../hooks/useGpsZone";
 import { useTheme } from "../context/ThemeContext";
 import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { ACCENT_COLORS } from "../context/ThemeContext";
+import type { AccentColor } from "../context/ThemeContext";
 
 export default function SettingsPage() {
   const { zones, loading: zonesLoading } = useZones();
   const { zone, setZone } = useSelectedZone();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, accent, setAccent } = useTheme();
   const { status: gpsStatus, error: gpsError, detected, locate } = useGpsZone();
   const isDark = theme === "dark";
 
@@ -156,54 +158,115 @@ export default function SettingsPage() {
       </section>
 
       {/* APPEARANCE */}
-      <section
-        className="rounded-2xl shadow-sm border p-5"
-        style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
-      >
-        <div className="flex items-center gap-2 mb-4">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ background: isDark ? "#1e3a5f" : "#eef2ff" }}
-          >
-            {isDark ? (
-              <Moon size={16} className="text-indigo-400" />
-            ) : (
-              <Sun size={16} className="text-indigo-500" />
-            )}
-          </div>
-          <div>
-            <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-              Mod Tatapan
-            </p>
-            <p className="text-xs" style={{ color: "var(--muted)" }}>
-              Pilih antara mod gelap atau terang
-            </p>
-          </div>
-        </div>
+<section
+  className="rounded-2xl shadow-sm border p-5 space-y-5"
+  style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
+>
+  {/* Header */}
+  <div className="flex items-center gap-2">
+    <div
+      className="w-8 h-8 rounded-full flex items-center justify-center"
+      style={{ background: isDark ? "#1e3a5f" : "#eef2ff" }}
+    >
+      {isDark ? (
+        <Moon size={16} className="text-indigo-400" />
+      ) : (
+        <Sun size={16} className="text-indigo-500" />
+      )}
+    </div>
+    <div>
+      <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
+        Mod Tatapan
+      </p>
+      <p className="text-xs" style={{ color: "var(--muted)" }}>
+        Pilih antara mod gelap atau terang
+      </p>
+    </div>
+  </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
-              Mod Gelap
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-              {isDark ? "Buka" : "Tutup"}
-            </p>
-          </div>
+  {/* Dark mode toggle */}
+  <div className="flex items-center justify-between">
+    <div>
+      <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+        Mod Gelap
+      </p>
+      <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
+        {isDark ? "Buka" : "Tutup"}
+      </p>
+    </div>
+    <button
+      onClick={toggleTheme}
+      aria-label="Toggle dark mode"
+      className="relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      style={{ background: isDark ? "var(--accent)" : "var(--card-border)" }}
+    >
+      <span
+        className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-300"
+        style={{ transform: isDark ? "translateX(24px)" : "translateX(0)" }}
+      />
+    </button>
+  </div>
 
+  {/* Divider */}
+  <div className="border-t" style={{ borderColor: "var(--card-border)" }} />
+
+  {/* Accent colour picker */}
+  <div>
+    <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--foreground)" }}>
+      Warna Tema
+    </p>
+    <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
+      Pilih warna utama aplikasi
+    </p>
+
+    <div className="grid grid-cols-4 gap-2">
+      {ACCENT_COLORS.map((color) => {
+        const isActive = accent === color.id;
+        const swatch = isDark ? color.darkHex : color.hex;
+        return (
           <button
-            onClick={toggleTheme}
-            aria-label="Toggle dark mode"
-            className="relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            style={{ background: isDark ? "#3b82f6" : "var(--card-border)" }}
+            key={color.id}
+            onClick={() => setAccent(color.id as AccentColor)}
+            aria-label={color.label}
+            title={color.label}
+            className="flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-150"
+            style={{
+              background: isActive
+                ? swatch + (isDark ? "33" : "18")
+                : "transparent",
+              border: "1.5px solid",
+              borderColor: isActive ? swatch : "var(--card-border)",
+            }}
           >
+            {/* Swatch circle */}
             <span
-              className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-300"
-              style={{ transform: isDark ? "translateX(24px)" : "translateX(0)" }}
-            />
+              className="w-7 h-7 rounded-full flex items-center justify-center shadow-sm"
+              style={{ background: swatch }}
+            >
+              {isActive && (
+                <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5">
+                  <path
+                    d="M5 13l4 4L19 7"
+                    stroke="white"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </span>
+            <span
+              className="text-xs font-medium leading-none"
+              style={{ color: isActive ? swatch : "var(--muted)" }}
+            >
+              {color.label}
+            </span>
           </button>
-        </div>
-      </section>
+        );
+      })}
+    </div>
+  </div>
+</section>
     </main>
   );
 }

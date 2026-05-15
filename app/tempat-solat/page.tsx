@@ -35,18 +35,25 @@ function DistanceBadge({ km }: { km: number }) {
 }
 
 function TypeBadge({ type }: { type: MosquePlace["type"] }) {
-  const styles: Record<MosquePlace["type"], { bg: string; text: string; label: string }> = {
-    masjid: { bg: "#1e3a5f", text: "#93c5fd", label: "Masjid" },
-    surau: { bg: "#1a3a2a", text: "#86efac", label: "Surau" },
-    lain: { bg: "#2a1a3a", text: "#c4b5fd", label: "Lain" },
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const styles: Record<MosquePlace["type"], { label: string }> = {
+    masjid: { label: "Masjid" },
+    surau: { label: "Surau" },
+    lain: { label: "Lain" },
   };
-  const s = styles[type];
+
   return (
     <span
       className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide shrink-0"
-      style={{ background: s.bg, color: s.text }}
+      style={{
+        background: "var(--accent-subtle)",
+        color: "var(--accent)",
+        border: "1px solid var(--accent-border)",
+      }}
     >
-      {s.label}
+      {styles[type].label}
     </span>
   );
 }
@@ -62,9 +69,9 @@ function MosqueCard({ place, isDark }: { place: MosquePlace; isDark: boolean }) 
       {/* Icon */}
       <div
         className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
-        style={{ background: isDark ? "#1e3a5f" : "#eef2ff" }}
+        style={{ background: "var(--accent-subtle)" }}
       >
-        <Building2 size={18} className="text-indigo-400" />
+        <Building2 size={18} style={{ color: "var(--accent)" }} />
       </div>
 
       {/* Content */}
@@ -98,8 +105,9 @@ function MosqueCard({ place, isDark }: { place: MosquePlace; isDark: boolean }) 
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors"
           style={{
-            background: isDark ? "#1e3a5f" : "#eef2ff",
-            color: isDark ? "#93c5fd" : "#4338ca",
+            background: "var(--accent-subtle)",
+            color: "var(--accent)",
+            border: "1px solid var(--accent-border)",
           }}
         >
           <Navigation2 size={12} />
@@ -117,7 +125,6 @@ export default function TempatSolatPage() {
   const { places, status, error, locate } = useNearbyMosques();
   const [filter, setFilter] = useState<FilterType>("semua");
 
-  // Auto-locate on mount
   useEffect(() => {
     locate();
   }, [locate]);
@@ -141,15 +148,15 @@ export default function TempatSolatPage() {
           <p className="mt-1 text-sm opacity-80">Masjid & surau berdekatan anda</p>
         </div>
 
-        {/* Refresh / Locate button */}
         <button
           onClick={locate}
           disabled={isBusy}
           aria-label="Refresh lokasi"
           className="mt-1 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all disabled:opacity-50"
           style={{
-            background: isDark ? "#1e3a5f" : "#eef2ff",
-            color: isDark ? "#93c5fd" : "#4338ca",
+            background: "var(--accent-subtle)",
+            color: "var(--accent)",
+            border: "1px solid var(--accent-border)",
           }}
         >
           {isBusy ? (
@@ -181,12 +188,9 @@ export default function TempatSolatPage() {
                 onClick={() => setFilter(f)}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
                 style={{
-                  background: active
-                    ? isDark ? "#1e3a5f" : "#eef2ff"
-                    : "transparent",
-                  color: active
-                    ? isDark ? "#93c5fd" : "#4338ca"
-                    : "var(--muted)",
+                  background: active ? "var(--accent-subtle)" : "transparent",
+                  color: active ? "var(--accent)" : "var(--muted)",
+                  border: active ? "1px solid var(--accent-border)" : "1px solid transparent",
                 }}
               >
                 {FILTER_LABELS[f]}
@@ -194,9 +198,8 @@ export default function TempatSolatPage() {
                   <span
                     className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
                     style={{
-                      background: active
-                        ? isDark ? "#2d4a7f" : "#c7d2fe"
-                        : "var(--card-border)",
+                      background: active ? "var(--accent-border)" : "var(--card-border)",
+                      color: active ? "var(--accent)" : "var(--muted)",
                     }}
                   >
                     {count}
@@ -236,23 +239,26 @@ export default function TempatSolatPage() {
         <div
           className="rounded-2xl border p-5 flex flex-col items-center text-center gap-3"
           style={{
-            background: isDark ? "#2d0a0a" : "#fff1f2",
-            borderColor: isDark ? "#7f1d1d" : "#fecdd3",
+            background: "var(--accent-subtle)",
+            borderColor: "var(--accent-border)",
           }}
         >
-          <AlertCircle size={32} style={{ color: isDark ? "#fca5a5" : "#be123c" }} />
+          <AlertCircle size={32} style={{ color: "var(--accent)" }} />
           <div>
-            <p className="text-sm font-semibold" style={{ color: isDark ? "#fca5a5" : "#be123c" }}>
+            <p className="text-sm font-semibold" style={{ color: "var(--accent)" }}>
               Ralat
             </p>
-            <p className="text-xs mt-1" style={{ color: isDark ? "#fca5a5" : "#be123c", opacity: 0.8 }}>
+            <p className="text-xs mt-1" style={{ color: "var(--accent)", opacity: 0.8 }}>
               {error}
             </p>
           </div>
           <button
             onClick={locate}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold"
-            style={{ background: isDark ? "#7f1d1d" : "#fecdd3", color: isDark ? "#fca5a5" : "#be123c" }}
+            style={{
+              background: "var(--accent-border)",
+              color: "var(--accent)",
+            }}
           >
             <RefreshCw size={12} />
             Cuba Lagi
