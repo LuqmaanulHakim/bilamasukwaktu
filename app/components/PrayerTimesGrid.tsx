@@ -155,7 +155,7 @@ export default function PrayerTimesGrid({ zone }: Props) {
       </div>
 
       {/* Prayer Times */}
-      <div className="grid grid-cols-3 gap-3 text-center">
+      <div className="grid grid-cols-3 gap-1 text-center">
         {PRAYERS.map(({ key, label }) => (
           <div
             key={key}
