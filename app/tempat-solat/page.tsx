@@ -22,6 +22,8 @@ const FILTER_LABELS: Record<FilterType, string> = {
   surau: "Surau",
 };
 
+const MAPS_URL = process.env.NEXT_PUBLIC_MAPS_DIRECTIONS_URL;
+
 function DistanceBadge({ km }: { km: number }) {
   const label = km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
   return (
@@ -59,7 +61,7 @@ function TypeBadge({ type }: { type: MosquePlace["type"] }) {
 }
 
 function MosqueCard({ place, isDark }: { place: MosquePlace; isDark: boolean }) {
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`;
+  const directionsUrl = `${MAPS_URL}?api=1&destination=${place.lat},${place.lon}`;
 
   return (
     <div

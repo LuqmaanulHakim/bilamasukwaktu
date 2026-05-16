@@ -10,6 +10,8 @@ type GpsZoneResult = {
   district: string;
 };
 
+const API_waktusolat = process.env.NEXT_PUBLIC_API_WAKTUSOLAT;
+
 export function useGpsZone() {
   const [status, setStatus] = useState<GpsStatus>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +33,7 @@ export function useGpsZone() {
         const { latitude, longitude } = pos.coords;
         try {
           const res = await fetch(
-            `https://api.waktusolat.app/zones/${latitude}/${longitude}`
+            `${API_waktusolat}/zones/${latitude}/${longitude}`
           );
           if (!res.ok) throw new Error("Gagal mendapatkan zon.");
           const data: GpsZoneResult = await res.json();

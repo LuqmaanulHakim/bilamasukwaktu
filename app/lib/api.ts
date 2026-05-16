@@ -1,6 +1,9 @@
+const API_waktusolat =
+  process.env.NEXT_PUBLIC_WAKTU_SOLAT_API_URL;
+
 export async function getPrayerTimes(zone: string) {
   const res = await fetch(
-    `https://api.waktusolat.app/solat/${zone}`,
+    `${API_waktusolat}/solat/${zone}`,
     {
       cache: "no-store",
     }
@@ -15,7 +18,7 @@ export async function getPrayerTimes(zone: string) {
 
 export async function getZones() {
   const res = await fetch(
-    `https://api.waktusolat.app/zones`,
+    `${API_waktusolat}/zones`,
     {
       cache: "no-store",
     }
