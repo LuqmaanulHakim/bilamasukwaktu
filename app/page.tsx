@@ -3,7 +3,7 @@
 import PrayerTimesGrid from "./components/PrayerTimesGrid";
 import SunTimeline from "./components/SunTimeline";
 import { useZones } from "./hooks/useZones";
-import { useWaktuSolat } from "./hooks/useWaktuSolat";
+import { useWaktuSolatWeek } from "./hooks/useWaktuSolatWeek";
 import { useSelectedZone } from "./hooks/useSelectedZone";
 import { useTheme } from "./context/ThemeContext";
 
@@ -96,7 +96,10 @@ const PrayerTimesGridSkeleton = () => {
 export default function Home() {
   const { zones, loading: zonesLoading } = useZones();
   const { zone } = useSelectedZone();
-  const { data, error } = useWaktuSolat(zone);
+  const { week, error } = useWaktuSolatWeek(zone);
+
+  const today    = week[0] ?? null;
+  const tomorrow = week[1] ?? null;
 
   if (zonesLoading) {
     return (
@@ -131,7 +134,7 @@ export default function Home() {
     );
   }
 
-  if (!data) {
+  if (!today) {
     return (
       <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
         <HeroSkeleton />
@@ -162,7 +165,7 @@ export default function Home() {
       </section>
 
       {/* TIMELINE */}
-      <SunTimeline data={data as any} />
+      <SunTimeline data={today} tomorrow={tomorrow} />
 
       {/* PRAYER TIMES */}
       <PrayerTimesGrid zone={zone} />

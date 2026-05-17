@@ -10,7 +10,7 @@ type GpsZoneResult = {
   district: string;
 };
 
-const API_waktusolat = process.env.NEXT_PUBLIC_API_WAKTUSOLAT;
+const API_waktusolat = process.env.NEXT_PUBLIC_WAKTU_SOLAT_API_URL;
 
 export function useGpsZone() {
   const [status, setStatus] = useState<GpsStatus>("idle");

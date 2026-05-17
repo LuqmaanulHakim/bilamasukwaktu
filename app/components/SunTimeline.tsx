@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Prayer } from "../hooks/useWaktuSolat";
+import { PrayerWeek } from "../hooks/useWaktuSolatWeek";
 import { useTheme } from "../context/ThemeContext";
 
-export default function SunTimeline({ data }: { data: Prayer }) {
+interface SunTimelineProps {
+  data: PrayerWeek;
+  tomorrow?: PrayerWeek | null;
+}
+
+export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps) {
   const [currentHour, setCurrentHour] = useState(0);
   const [now, setNow] = useState(new Date());
   const { theme } = useTheme();
@@ -38,17 +43,30 @@ export default function SunTimeline({ data }: { data: Prayer }) {
     { name: "Isya",    time: data.isha },
   ];
 
-  function parseTime(timeStr: string): Date {
+  function parseTime(timeStr: string, dayOffset = 0): Date {
     const [h, m] = timeStr.split(":").map(Number);
     const d = new Date(now);
+    d.setDate(d.getDate() + dayOffset);
     d.setHours(h, m, 0, 0);
     return d;
   }
 
-  const nextPrayer = prayers.find(p => parseTime(p.time) > now) ?? null;
+  // Next prayer still remaining today
+  const nextPrayerToday = prayers.find(p => parseTime(p.time) > now) ?? null;
 
-  function formatCountdown(targetStr: string): string {
-    const diffMs = parseTime(targetStr).getTime() - now.getTime();
+  // Tomorrow's Subuh — only relevant when all today's prayers are done
+  const nextPrayerTomorrow = !nextPrayerToday && tomorrow
+    ? { name: "Subuh", time: tomorrow.fajr, isTomorrow: true as const }
+    : null;
+
+  // Whichever is applicable
+  const nextPrayer: { name: string; time: string; isTomorrow: boolean } | null =
+    nextPrayerToday
+      ? { ...nextPrayerToday, isTomorrow: false }
+      : nextPrayerTomorrow;
+
+  function formatCountdown(targetStr: string, dayOffset = 0): string {
+    const diffMs = parseTime(targetStr, dayOffset).getTime() - now.getTime();
     if (diffMs <= 0) return "Sekarang";
     const totalSecs = Math.floor(diffMs / 1000);
     const h = Math.floor(totalSecs / 3600);
@@ -59,7 +77,7 @@ export default function SunTimeline({ data }: { data: Prayer }) {
     return `${s}s`;
   }
 
-  // ── SVG graph (unchanged) ────────────────────────────────────────────
+  // ── SVG graph ────────────────────────────────────────────────────────
   const sunrise = convertToHour(data.syuruk);
   const sunset  = convertToHour(data.maghrib);
 
@@ -230,7 +248,7 @@ export default function SunTimeline({ data }: { data: Prayer }) {
               className="text-sm font-semibold tabular-nums"
               style={{ color: "var(--accent)" }}
             >
-              {formatCountdown(nextPrayer.time)}
+              {formatCountdown(nextPrayer.time, nextPrayer.isTomorrow ? 1 : 0)}
             </p>
           </div>
         </>
