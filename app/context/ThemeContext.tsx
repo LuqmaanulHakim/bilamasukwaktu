@@ -22,6 +22,8 @@ interface ThemeContextValue {
   toggleTheme: () => void;
   accent: AccentColor;
   setAccent: (color: AccentColor) => void;
+  showCountdown: boolean;
+  toggleCountdown: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
@@ -29,6 +31,8 @@ const ThemeContext = createContext<ThemeContextValue>({
   toggleTheme: () => {},
   accent: "indigo",
   setAccent: () => {},
+  showCountdown: true,
+  toggleCountdown: () => {},
 });
 
 function applyAccent(accent: AccentColor, theme: Theme) {
@@ -40,39 +44,32 @@ function applyAccent(accent: AccentColor, theme: Theme) {
   document.documentElement.style.setProperty("--accent-border", hex + (theme === "dark" ? "55" : "40"));
 
   if (theme === "dark") {
-    document.documentElement.style.setProperty(
-      "--background-tint-start",
-      `color-mix(in srgb, ${hex} 12%, #0f172a)`
-    );
-    document.documentElement.style.setProperty(
-      "--background-tint-end",
-      `color-mix(in srgb, ${hex} 6%, #1e293b)`
-    );
+    document.documentElement.style.setProperty("--background-tint-start", `color-mix(in srgb, ${hex} 12%, #0f172a)`);
+    document.documentElement.style.setProperty("--background-tint-end", `color-mix(in srgb, ${hex} 6%, #1e293b)`);
   } else {
-    document.documentElement.style.setProperty(
-      "--background-tint-start",
-      `color-mix(in srgb, ${hex} 15%, #dbeafe)`
-    );
-    document.documentElement.style.setProperty(
-      "--background-tint-end",
-      `color-mix(in srgb, ${hex} 5%, #f8fafc)`
-    );
+    document.documentElement.style.setProperty("--background-tint-start", `color-mix(in srgb, ${hex} 15%, #dbeafe)`);
+    document.documentElement.style.setProperty("--background-tint-end", `color-mix(in srgb, ${hex} 5%, #f8fafc)`);
   }
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   const [accent, setAccentState] = useState<AccentColor>("indigo");
+  const [showCountdown, setShowCountdown] = useState<boolean>(true);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") as Theme | null;
     const storedAccent = localStorage.getItem("accent") as AccentColor | null;
+    const storedCountdown = localStorage.getItem("showCountdown");
     const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const initialTheme = storedTheme ?? preferred;
+
+    const initialTheme: Theme = storedTheme ?? preferred;
     const initialAccent: AccentColor = storedAccent ?? "indigo";
+    const initialCountdown: boolean  = storedCountdown === null ? true : storedCountdown === "true";
 
     setTheme(initialTheme);
     setAccentState(initialAccent);
+    setShowCountdown(initialCountdown);
     document.documentElement.setAttribute("data-theme", initialTheme);
     applyAccent(initialAccent, initialTheme);
   }, []);
@@ -93,8 +90,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     applyAccent(color, theme);
   };
 
+  const toggleCountdown = () => {
+    setShowCountdown((prev) => {
+      const next = !prev;
+      localStorage.setItem("showCountdown", String(next));
+      return next;
+    });
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, accent, setAccent }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -12,7 +12,7 @@ interface SunTimelineProps {
 export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps) {
   const [currentHour, setCurrentHour] = useState(0);
   const [now, setNow] = useState(new Date());
-  const { theme } = useTheme();
+  const { theme, showCountdown } = useTheme();
   const isDark = theme === "dark";
 
   useEffect(() => {
@@ -33,7 +33,6 @@ export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps)
     return h + m / 60;
   }
 
-  // ── Prayer schedule ──────────────────────────────────────────────────
   const prayers = [
     { name: "Subuh",   time: data.fajr },
     { name: "Syuruk",  time: data.syuruk },
@@ -51,15 +50,12 @@ export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps)
     return d;
   }
 
-  // Next prayer still remaining today
   const nextPrayerToday = prayers.find(p => parseTime(p.time) > now) ?? null;
 
-  // Tomorrow's Subuh — only relevant when all today's prayers are done
   const nextPrayerTomorrow = !nextPrayerToday && tomorrow
     ? { name: "Subuh", time: tomorrow.fajr, isTomorrow: true as const }
     : null;
 
-  // Whichever is applicable
   const nextPrayer: { name: string; time: string; isTomorrow: boolean } | null =
     nextPrayerToday
       ? { ...nextPrayerToday, isTomorrow: false }
@@ -77,7 +73,6 @@ export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps)
     return `${s}s`;
   }
 
-  // ── SVG graph ────────────────────────────────────────────────────────
   const sunrise = convertToHour(data.syuruk);
   const sunset  = convertToHour(data.maghrib);
 
@@ -236,8 +231,8 @@ export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps)
         </svg>
       </div>
 
-      {/* ── Next prayer countdown ── */}
-      {nextPrayer && (
+      {/* Next prayer countdown & respects showCountdown setting */}
+      {showCountdown && nextPrayer && (
         <>
           <div className="my-3" style={{ borderTop: `1px solid var(--card-border)` }} />
           <div className="flex items-center justify-between px-1">
