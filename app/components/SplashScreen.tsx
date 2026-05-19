@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function SplashScreen() {
   const [visible, setVisible] = useState(true);
@@ -9,11 +10,11 @@ export default function SplashScreen() {
   useEffect(() => {
     const timer1 = setTimeout(() => {
       setFadeOut(true);
-    }, 100); // start fade out
+    }, 450); // start fade out
 
     const timer2 = setTimeout(() => {
       setVisible(false);
-    }, 100); // remove from DOM
+    }, 450); // remove from DOM
 
     return () => {
       clearTimeout(timer1);
@@ -38,16 +39,16 @@ export default function SplashScreen() {
       {/* Content */}
       <div className="text-center relative">
         {/* Moon */}
-        <div className="text-6xl mb-4 animate-bounce">🌙</div>
-
-        {/* App name */}
-        <h1 className="text-white text-2xl font-semibold tracking-wide">
-          Bila Masuk Waktu
-        </h1>
-
-        <p className="text-white/60 text-sm mt-2">
-          Starting...
-        </p>
+        <div className="flex justify-center mb-4">
+            <Image
+                src="/icon_bmw.png"
+                alt="Moon"
+                width={100}
+                height={100}
+                priority
+                className="object-contain"
+            />
+        </div>
       </div>
     </div>
   );
