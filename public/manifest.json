@@ -1,8 +1,8 @@
 {
   "name": "Bila Masuk Waktu",
   "short_name": "Bila Masuk Waktu",
-  "theme_color": "#071018",
-  "background_color": "#071018",
+  "theme_color": "#0b1220",
+  "background_color": "#0b1220",
   "display": "standalone",
   "start_url": "/",
   "icons": [

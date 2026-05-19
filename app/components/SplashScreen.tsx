@@ -9,11 +9,11 @@ export default function SplashScreen() {
   useEffect(() => {
     const timer1 = setTimeout(() => {
       setFadeOut(true);
-    }, 2000); // start fade out
+    }, 100); // start fade out
 
     const timer2 = setTimeout(() => {
       setVisible(false);
-    }, 2600); // remove from DOM
+    }, 100); // remove from DOM
 
     return () => {
       clearTimeout(timer1);
@@ -42,11 +42,11 @@ export default function SplashScreen() {
 
         {/* App name */}
         <h1 className="text-white text-2xl font-semibold tracking-wide">
-          Noor Prayer
+          Bila Masuk Waktu
         </h1>
 
         <p className="text-white/60 text-sm mt-2">
-          Bismillah...
+          Starting...
         </p>
       </div>
     </div>
