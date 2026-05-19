@@ -6,13 +6,11 @@ import { useNearbyMosques, type MosquePlace } from "../hooks/useNearbyMosque";
 import {
   LocateFixed,
   Loader2,
-  Navigation2,
-  MapPin,
   AlertCircle,
   RefreshCw,
-  Building2,
   ChevronRight,
 } from "lucide-react";
+import { IconMosque, IconLocation } from "@tabler/icons-react";
 
 type FilterType = "semua" | "masjid" | "surau";
 
@@ -73,7 +71,7 @@ function MosqueCard({ place, isDark }: { place: MosquePlace; isDark: boolean }) 
         className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
         style={{ background: "var(--accent-subtle)" }}
       >
-        <Building2 size={18} style={{ color: "var(--accent)" }} />
+        <IconMosque size={18} style={{ color: "var(--accent)" }} />
       </div>
 
       {/* Content */}
@@ -92,15 +90,6 @@ function MosqueCard({ place, isDark }: { place: MosquePlace; isDark: boolean }) 
           <TypeBadge type={place.type} />
         </div>
 
-        {place.address && (
-          <div className="flex items-start gap-1 mb-3">
-            <MapPin size={11} className="shrink-0 mt-0.5" style={{ color: "var(--muted)" }} />
-            <p className="text-[11px] leading-relaxed" style={{ color: "var(--muted)" }}>
-              {place.address}
-            </p>
-          </div>
-        )}
-
         <a
           href={directionsUrl}
           target="_blank"
@@ -112,7 +101,7 @@ function MosqueCard({ place, isDark }: { place: MosquePlace; isDark: boolean }) 
             border: "1px solid var(--accent-border)",
           }}
         >
-          <Navigation2 size={12} />
+          <IconLocation size={12} />
           Dapatkan Arah
           <ChevronRight size={11} />
         </a>
@@ -276,7 +265,7 @@ export default function TempatSolatPage() {
               className="rounded-2xl border p-6 text-center"
               style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
             >
-              <Building2 size={32} className="mx-auto mb-2 opacity-30" />
+              <IconMosque size={32} className="mx-auto mb-2 opacity-30" />
               <p className="text-sm font-medium opacity-60">
                 Tiada {filter !== "semua" ? FILTER_LABELS[filter] : "tempat solat"} dijumpai
               </p>

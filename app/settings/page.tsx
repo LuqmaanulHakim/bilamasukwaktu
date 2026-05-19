@@ -220,7 +220,7 @@ export default function SettingsPage() {
 
         {/* Accent colour picker */}
         <div>
-          <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--foreground)" }}>Warna Tema</p>
+          <p className="text-sm mb-0.5" style={{ color: "var(--foreground)" }}>Warna Tema</p>
           <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>Pilih warna utama aplikasi</p>
           <div className="grid grid-cols-4 gap-2">
             {ACCENT_COLORS.map((color) => {
