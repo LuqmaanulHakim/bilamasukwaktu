@@ -9,7 +9,7 @@ export default function SplashScreen() {
   const [progress, setProgress] = useState(0); // 0 → 1 over the animation
 
   // Total splash duration
-  const DURATION = 2800;
+  const DURATION = 3600;
 
   useEffect(() => {
     const start = performance.now();
