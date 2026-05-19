@@ -1,19 +1,54 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PrayerWeek } from "../hooks/useWaktuSolatWeek";
+import { useWaktuSolatWeek } from "../hooks/useWaktuSolatWeek";
 import { useTheme } from "../context/ThemeContext";
 
 interface SunTimelineProps {
-  data: PrayerWeek;
-  tomorrow?: PrayerWeek | null;
+  zone: string;
 }
 
-export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps) {
+const SunTimelineSkeleton = () => {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <div
+      className="rounded-3xl p-6 shadow-sm border animate-pulse"
+      style={{
+        background: "var(--card-bg)",
+        borderColor: "var(--card-border)",
+      }}
+    >
+      <div className="mb-4">
+        <div className="h-3 w-24 rounded" style={{ background: isDark ? "#334155" : "#e2e8f0" }}></div>
+        <div className="h-6 w-32 rounded mt-1" style={{ background: isDark ? "#475569" : "#cbd5e1" }}></div>
+      </div>
+      <div className="w-full flex justify-center">
+        <div className="w-[320px] h-[200px] rounded-lg" style={{ background: isDark ? "#1e293b" : "#f8fafc" }}></div>
+      </div>
+      <div className="flex justify-between mt-3">
+        <div>
+          <div className="h-3 w-12 rounded mb-1" style={{ background: isDark ? "#334155" : "#e2e8f0" }}></div>
+          <div className="h-5 w-16 rounded" style={{ background: isDark ? "#475569" : "#cbd5e1" }}></div>
+        </div>
+        <div className="text-right">
+          <div className="h-3 w-12 rounded mb-1 ml-auto" style={{ background: isDark ? "#334155" : "#e2e8f0" }}></div>
+          <div className="h-5 w-16 rounded ml-auto" style={{ background: isDark ? "#475569" : "#cbd5e1" }}></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function SunTimeline({ zone }: SunTimelineProps) {
   const [currentHour, setCurrentHour] = useState(0);
   const [now, setNow] = useState(new Date());
   const { theme, showCountdown } = useTheme();
   const isDark = theme === "dark";
+  const { week } = useWaktuSolatWeek(zone);
+  const data = week[0] ?? null;
+  const tomorrow = week[1] ?? null;
 
   useEffect(() => {
     const updateTime = () => {
@@ -27,6 +62,8 @@ export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps)
     frame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frame);
   }, []);
+
+  if (!data) return <SunTimelineSkeleton />;
 
   function convertToHour(time: string) {
     const [h, m] = time.split(":").map(Number);
@@ -231,7 +268,7 @@ export default function SunTimeline({ data, tomorrow = null }: SunTimelineProps)
         </svg>
       </div>
 
-      {/* Next prayer countdown & respects showCountdown setting */}
+      {/* Next prayer countdown */}
       {showCountdown && nextPrayer && (
         <>
           <div className="my-3" style={{ borderTop: `1px solid var(--card-border)` }} />

@@ -6,7 +6,7 @@ import { useZones } from "./hooks/useZones";
 import { useWaktuSolatWeek } from "./hooks/useWaktuSolatWeek";
 import { useSelectedZone } from "./hooks/useSelectedZone";
 import { useTheme } from "./context/ThemeContext";
-import IslamicDashboardCard from "./components/DashboardCard";
+import DashboardCard from "./components/DashboardCard";
 
 const getMalayDate = (date: Date) => {
   return date.toLocaleDateString("ms-MY", {
@@ -78,17 +78,17 @@ const PrayerTimesGridSkeleton = () => {
     >
       <div className="grid grid-cols-3 gap-4 text-center">
         {["Subuh", "Syuruk", "Zohor", "Asar", "Maghrib", "Isha"].map((name, index) => (
-            <div
-              key={index}
-              className="rounded-2xl py-3"
-              style={{
-                background: isDark ? "rgba(51,65,85,0.4)" : "rgba(255,255,255,0.4)",
-              }}
-            >
-              <div className="h-4 w-16 rounded mx-auto" style={{ background: isDark ? "#334155" : "#e2e8f0" }}></div>
-              <div className="h-6 w-20 rounded mx-auto mt-2" style={{ background: isDark ? "#475569" : "#cbd5e1" }}></div>
-            </div>
-          ))}
+          <div
+            key={index}
+            className="rounded-2xl py-3"
+            style={{
+              background: isDark ? "rgba(51,65,85,0.4)" : "rgba(255,255,255,0.4)",
+            }}
+          >
+            <div className="h-4 w-16 rounded mx-auto" style={{ background: isDark ? "#334155" : "#e2e8f0" }}></div>
+            <div className="h-6 w-20 rounded mx-auto mt-2" style={{ background: isDark ? "#475569" : "#cbd5e1" }}></div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -96,41 +96,12 @@ const PrayerTimesGridSkeleton = () => {
 
 export default function Home() {
   const { zones, loading: zonesLoading } = useZones();
-  const { zone } = useSelectedZone();
+  const { zone, isHydrated } = useSelectedZone();
   const { week, error } = useWaktuSolatWeek(zone);
 
-  const today = week[0] ?? null;
-  const tomorrow = week[1] ?? null;
+  const today    = week[0] ?? null;
 
-  const dailyZikir: Record<string, string> = {
-    Isnin:
-      "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيم",
-    Selasa:
-      "اللَّهُمَّ صَلِّ عَلَى عَبْدِكَ وَرَسُولِكَ وَنَبِيِّكَ الأَمِينِ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمْ",
-    Rabu:
-      "اَسْتَغْفِرُاللهَ الْعَظِيْمَ",
-    Khamis:
-      "سُبْحَانَ اللَّهِ العَظِيم سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
-    Jumaat:
-      "يَا اللّٰهُ",
-    Sabtu:
-      "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ",
-    Ahad:
-      "يَا حَيُّ يَا قَيُّومُ",
-  };
-
-  const getCurrentMalayDay = (override?: string) => {
-  if (override) return override;
-
-  return new Date().toLocaleDateString("ms-MY", {
-    weekday: "long",
-  });
-};
-
-const currentDay = getCurrentMalayDay("Selasa"); // debug
-const zikirText = dailyZikir[currentDay];
-
-  if (zonesLoading) {
+  if (zonesLoading || !isHydrated) {
     return (
       <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
         <HeroSkeleton />
@@ -177,14 +148,10 @@ const zikirText = dailyZikir[currentDay];
 
   return (
     <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
-      <IslamicDashboardCard
-        selectedZone={selectedZone}
-        zikirText={zikirText}
-        getMalayDate={getMalayDate}
-      />
+      <DashboardCard selectedZone={selectedZone} getMalayDate={getMalayDate} />
 
       {/* TIMELINE */}
-      <SunTimeline data={today} tomorrow={tomorrow} />
+      <SunTimeline zone={zone} />
 
       {/* PRAYER TIMES */}
       <PrayerTimesGrid zone={zone} />
