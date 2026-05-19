@@ -164,11 +164,6 @@ export default function SplashScreen() {
           {/* Horizon */}
           <line x1={cx - rx - 20} y1={cy} x2={cx + rx + 20} y2={cy} stroke={horizonColor} strokeWidth="1" />
 
-          {/* Active arc */}
-          {progress > 0.01 && (
-            <path d={activeArc} fill="none" stroke={arcColor} strokeWidth="2.5" strokeLinecap="round" />
-          )}
-
           {/* Glow + sun */}
           <circle cx={sunX} cy={sunY} r={24} fill={sunGlow} />
           <circle cx={sunX} cy={sunY} r={9}  fill={sunColor} />
