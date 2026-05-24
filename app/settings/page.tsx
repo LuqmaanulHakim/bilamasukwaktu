@@ -5,14 +5,14 @@ import { useZones } from "../hooks/useZones";
 import { useSelectedZone } from "../hooks/useSelectedZone";
 import { useGpsZone } from "../hooks/useGpsZone";
 import { useTheme } from "../context/ThemeContext";
-import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle, Timer } from "lucide-react";
+import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle, Timer, BellRing } from "lucide-react";
 import { ACCENT_COLORS } from "../context/ThemeContext";
 import type { AccentColor } from "../context/ThemeContext";
 
 export default function SettingsPage() {
   const { zones, loading: zonesLoading } = useZones();
   const { zone, setZone } = useSelectedZone();
-  const { theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown } = useTheme();
+  const { theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown, showPrayerPopup, togglePrayerPopup } = useTheme();
   const { status: gpsStatus, error: gpsError, detected, locate } = useGpsZone();
   const isDark = theme === "dark";
 
@@ -147,24 +147,51 @@ export default function SettingsPage() {
       </section>
 
       <section
-        className="rounded-2xl shadow-sm border p-5 space-y-3"
+        className="rounded-2xl shadow-sm border p-5 space-y-4"
         style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
       >
+        {/* Section header */}
+        <div className="flex items-center gap-2">
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: isDark ? "#1e3a5f" : "#eef2ff" }}
+          >
+            <BellRing size={16} className={isDark ? "text-indigo-400" : "text-indigo-500"} />
+          </div>
+          <div>
+            <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>Pemberitahuan</p>
+            <p className="text-xs" style={{ color: "var(--muted)" }}>Urus paparan waktu solat</p>
+          </div>
+        </div>
+
+        {/* Prayer popup toggle */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Popup Waktu Solat</p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
+              {showPrayerPopup ? "Papar semasa masuk waktu" : "Disembunyikan"}
+            </p>
+          </div>
+          <button
+            onClick={togglePrayerPopup}
+            aria-label="Toggle prayer popup"
+            className="relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            style={{ background: showPrayerPopup ? "var(--accent)" : "var(--card-border)" }}
+          >
+            <span
+              className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-300"
+              style={{ transform: showPrayerPopup ? "translateX(24px)" : "translateX(0)" }}
+            />
+          </button>
+        </div>
+
         {/* Countdown toggle */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-              style={{ background: isDark ? "#1e3a5f" : "#eef2ff" }}
-            >
-              <Timer size={16} className={isDark ? "text-indigo-400" : "text-indigo-500"} />
-            </div>
-            <div>
-              <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Kiraan Detik</p>
-              <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-                {showCountdown ? "Buka" : "Tutup"}
-              </p>
-            </div>
+          <div>
+            <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Kiraan Detik</p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
+              {showCountdown ? "Papar masa sehingga solat" : "Disembunyikan"}
+            </p>
           </div>
           <button
             onClick={toggleCountdown}
@@ -185,7 +212,6 @@ export default function SettingsPage() {
         className="rounded-2xl shadow-sm border p-5 space-y-5"
         style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
       >
-        {/* Header */}
         <div className="flex items-center gap-2">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center"

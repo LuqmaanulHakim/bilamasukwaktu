@@ -4,6 +4,8 @@ import "./globals.css";
 import DisableZoom from "./components/DisableZoom";
 import BottomNav from "./components/BottomNav";
 import { ThemeProvider } from "./context/ThemeContext";
+import { PrayerNotifProvider } from "./context/PrayerNotifContext";
+import PrayerPopup from "./components/PrayerPopup";
 import SplashScreen from "./components/SplashScreen";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -39,10 +41,13 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <DisableZoom />
-          <SplashScreen />
-          {children}
-          <BottomNav />
+          <PrayerNotifProvider>
+            <DisableZoom />
+            <SplashScreen />
+            {children}
+            <BottomNav />
+            <PrayerPopup />
+          </PrayerNotifProvider>
         </ThemeProvider>
       </body>
     </html>
