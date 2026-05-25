@@ -28,54 +28,75 @@ export default function PrayerPopup() {
   const { theme, showPrayerPopup } = useTheme();
   const isDark = theme === "dark";
 
-  const [visible, setVisible]     = useState(false);
-  const [rendered, setRendered]   = useState(false);
-  const [leaving, setLeaving]     = useState(false);
-  // Controls the progress bar width via CSS transition
-  const [barWidth, setBarWidth]   = useState("100%");
+  const [visible, setVisible]         = useState(false);
+  const [rendered, setRendered]       = useState(false);
+  const [leaving, setLeaving]         = useState(false);
+  const [barWidth, setBarWidth]       = useState("100%");
   const [barDuration, setBarDuration] = useState("0ms");
-  const prevNameRef = useRef<PrayerName | null>(null);
+
+  const prevNameRef  = useRef<PrayerName | null>(null);
+  const enterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (activePrayer) {
+    return () => {
+      if (enterTimerRef.current) clearTimeout(enterTimerRef.current);
+      if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (activePrayer && showPrayerPopup) {
       if (prevNameRef.current !== activePrayer.name) {
         prevNameRef.current = activePrayer.name;
-        setLeaving(false);
-        setRendered(true);
 
-        // How much of the 10-min window is already gone
+        // Cancel any ongoing leave
+        if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
+        setLeaving(false);
+
+        // Calculate remaining bar width
         const [h, m] = activePrayer.time.split(":").map(Number);
         const prayerStart = new Date();
         prayerStart.setHours(h, m, 0, 0);
-        const elapsed = Date.now() - prayerStart.getTime();
+        const elapsed   = Date.now() - prayerStart.getTime();
         const remaining = Math.max(POPUP_WINDOW_MS - elapsed, 0);
-        const startWidth = `${(remaining / POPUP_WINDOW_MS) * 100}%`;
+        const startPct  = `${(remaining / POPUP_WINDOW_MS) * 100}%`;
 
-        // Start bar at current remaining width, no transition yet
-        setBarWidth(startWidth);
+        // Mount the card, bar starts at current remaining %, no transition
+        setRendered(true);
+        setBarWidth(startPct);
         setBarDuration("0ms");
+        setVisible(false);
 
-        requestAnimationFrame(() => requestAnimationFrame(() => {
+        // Use setTimeout instead of rAF — more reliable on PWA cold start
+        enterTimerRef.current = setTimeout(() => {
           setVisible(true);
-          // Now animate bar down to 0 over exactly the remaining time
-          setBarWidth("0%");
-          setBarDuration(`${remaining}ms`);
-        }));
+          // Kick off bar drain after another tick so the initial width paints first
+          enterTimerRef.current = setTimeout(() => {
+            setBarWidth("0%");
+            setBarDuration(`${remaining}ms`);
+          }, 32);
+        }, 50); // 50ms is enough for the DOM to be ready even on slow PWA startup
       }
     } else {
-      handleLeave();
+      triggerLeave();
     }
-  }, [activePrayer]);
+  }, [activePrayer, showPrayerPopup]);
 
-  function handleLeave() {
+  function triggerLeave() {
+    if (enterTimerRef.current) clearTimeout(enterTimerRef.current);
     setLeaving(true);
     setVisible(false);
-    setTimeout(() => { setRendered(false); setLeaving(false); }, 400);
+    leaveTimerRef.current = setTimeout(() => {
+      setRendered(false);
+      setLeaving(false);
+      prevNameRef.current = null; // reset so same prayer can re-show if needed
+    }, 400);
   }
 
   function handleDismiss() {
     if (activePrayer) dismissPrayer(activePrayer.name);
-    handleLeave();
+    triggerLeave();
   }
 
   if (!rendered || !activePrayer || !showPrayerPopup) return null;
@@ -128,26 +149,16 @@ export default function PrayerPopup() {
             {/* Text */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
-                <span
-                  className="text-sm font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
+                <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
                   Waktu {activePrayer.name}
                 </span>
                 <span className="text-xs" style={{ color: "var(--muted)" }}>·</span>
-                <span
-                  className="text-xs tabular-nums"
-                  style={{ color: "var(--accent)" }}
-                >
+                <span className="text-xs tabular-nums" style={{ color: "var(--accent)" }}>
                   {formatTime(activePrayer.time)}
                 </span>
                 <span
                   className="text-xs ml-auto"
-                  style={{
-                    color: "var(--muted)",
-                    fontFamily: "serif",
-                    letterSpacing: "0.03em",
-                  }}
+                  style={{ color: "var(--muted)", fontFamily: "serif", letterSpacing: "0.03em" }}
                 >
                   {meta.arabic}
                 </span>
@@ -161,17 +172,14 @@ export default function PrayerPopup() {
             <button
               onClick={handleDismiss}
               className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-opacity hover:opacity-70"
-              style={{
-                background: "var(--accent-subtle)",
-                color: "var(--muted)",
-              }}
+              style={{ background: "var(--accent-subtle)", color: "var(--muted)" }}
               aria-label="Tutup"
             >
               <IconX size={14} stroke={2} />
             </button>
           </div>
 
-          {/* Countdown progress bar — shrinks from current remaining width → 0 */}
+          {/* Countdown progress bar */}
           <div className="h-[2px] w-full" style={{ background: "var(--accent-subtle)" }}>
             <div
               style={{
