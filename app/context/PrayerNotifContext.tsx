@@ -34,13 +34,11 @@ const PrayerNotifContext = createContext<PrayerNotifContextValue>({
 
 const POPUP_WINDOW_MS = 15 * 1000;
 
-// On PWA cold start, wait a bit before showing popup so the UI finishes painting
-const PWA_STARTUP_DELAY_MS = 800;
-
 export function PrayerNotifProvider({ children }: { children: React.ReactNode }) {
   const [zone, setZone] = useState<string>("");
   const [activePrayer, setActivePrayer] = useState<ActivePrayer | null>(null);
-  const [isReady, setIsReady] = useState(false); // gates popup until app is settled
+  // isReady now only flips after BOTH the startup delay AND data have arrived
+  const [startupDone, setStartupDone] = useState(false);
 
   const dismissedRef = useRef<Set<string>>(new Set());
   const timerRef     = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -49,13 +47,12 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
   const { week } = useWaktuSolatWeek(zone);
   const data = week[0] ?? null;
 
-  // Load zone + mark ready after startup delay
+  // Load zone + mark startup done after a short delay
   useEffect(() => {
     const stored = localStorage.getItem("selectedZone") ?? "";
     if (stored) setZone(stored);
 
-    // Give the PWA time to fully render before we start showing popups
-    const t = setTimeout(() => setIsReady(true), PWA_STARTUP_DELAY_MS);
+    const t = setTimeout(() => setStartupDone(true), 800);
     return () => clearTimeout(t);
   }, []);
 
@@ -73,7 +70,8 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
   }, []);
 
   useEffect(() => {
-    if (!data || !isReady) return;
+    // Wait for BOTH startup delay and API data — whichever comes last
+    if (!startupDone || !data) return;
 
     const prayers: { name: PrayerName; time: string }[] = [
       { name: "Subuh",   time: data.fajr },
@@ -115,7 +113,6 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
             return;
           }
 
-          // Dismissed — jump to next prayer
           const next = prayers[i + 1];
           if (next) {
             setActivePrayer(null);
@@ -143,7 +140,7 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
     schedule();
 
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [data, isReady]); // re-runs once isReady flips to true
+  }, [data, startupDone]); // fires when BOTH are ready, whichever arrives last
 
   const dismissPrayer = useCallback((name: PrayerName) => {
     const key = `${name}-${new Date().toDateString()}`;
@@ -161,4 +158,4 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
 
 export function usePrayerNotif() {
   return useContext(PrayerNotifContext);
-} 
+}
