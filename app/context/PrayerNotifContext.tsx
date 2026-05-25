@@ -8,6 +8,7 @@ import {
   useState,
   useCallback,
 } from "react";
+import { useWaktuSolatWeek } from "../hooks/useWaktuSolatWeek";
 
 export type PrayerName = "Subuh" | "Syuruk" | "Zohor" | "Asar" | "Maghrib" | "Isya";
 
@@ -32,36 +33,38 @@ const PrayerNotifContext = createContext<PrayerNotifContextValue>({
 });
 
 const POPUP_WINDOW_MS = 15 * 1000;
+
+// On PWA cold start, wait a bit before showing popup so the UI finishes painting
 const PWA_STARTUP_DELAY_MS = 800;
-
-function addMinutes(date: Date, mins: number): Date {
-  return new Date(date.getTime() + mins * 60 * 1000);
-}
-
-function toTimeStr(d: Date): string {
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
 
 export function PrayerNotifProvider({ children }: { children: React.ReactNode }) {
   const [zone, setZone] = useState<string>("");
   const [activePrayer, setActivePrayer] = useState<ActivePrayer | null>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(false); // gates popup until app is settled
 
   const dismissedRef = useRef<Set<string>>(new Set());
   const timerRef     = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleRef  = useRef<() => void>(() => {});
 
+  const { week } = useWaktuSolatWeek(zone);
+  const data = week[0] ?? null;
+
+  // Load zone + mark ready after startup delay
   useEffect(() => {
     const stored = localStorage.getItem("selectedZone") ?? "";
     if (stored) setZone(stored);
+
+    // Give the PWA time to fully render before we start showing popups
     const t = setTimeout(() => setIsReady(true), PWA_STARTUP_DELAY_MS);
     return () => clearTimeout(t);
   }, []);
 
+  // Reset dismissed set at midnight
   useEffect(() => {
     const now = new Date();
     const msUntilMidnight =
-      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() -
+      now.getTime();
     const t = setTimeout(() => {
       dismissedRef.current = new Set();
       scheduleRef.current();
@@ -70,21 +73,16 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
   }, []);
 
   useEffect(() => {
-    if (!isReady) return;
+    if (!data || !isReady) return;
 
-    // Hardcoded: Zohor = now, each subsequent prayer 2 minutes later
-    const base = new Date();
     const prayers: { name: PrayerName; time: string }[] = [
-      { name: "Subuh",   time: "05:00" },
-      { name: "Syuruk",  time: "07:10" },
-      { name: "Zohor",   time: toTimeStr(base) },                  // now
-      { name: "Asar",    time: toTimeStr(addMinutes(base, 1)) },   // now + 2min
-      { name: "Maghrib", time: toTimeStr(addMinutes(base, 4)) },   // now + 4min
-      { name: "Isya",    time: toTimeStr(addMinutes(base, 6)) },   // now + 6min
+      { name: "Subuh",   time: data.fajr },
+      { name: "Syuruk",  time: data.syuruk },
+      { name: "Zohor",   time: data.dhuhr },
+      { name: "Asar",    time: data.asr },
+      { name: "Maghrib", time: data.maghrib },
+      { name: "Isya",    time: data.isha },
     ];
-
-    console.log("[DEBUG] Prayer schedule:");
-    prayers.forEach(p => console.log(` ${p.name}: ${p.time}`));
 
     function toMs(time: string): number {
       const [h, m] = time.split(":").map(Number);
@@ -97,7 +95,6 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
       if (timerRef.current) clearTimeout(timerRef.current);
 
       const nowMs = Date.now();
-      console.log("[DEBUG] schedule() at", new Date().toLocaleTimeString());
 
       for (let i = 0; i < prayers.length; i++) {
         const { name, time } = prayers[i];
@@ -106,12 +103,11 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
 
         if (diff >= 0 && diff < POPUP_WINDOW_MS) {
           const key = `${name}-${new Date().toDateString()}`;
-          console.log(`[DEBUG] Inside window: ${name}, dismissed=${dismissedRef.current.has(key)}`);
 
           if (!dismissedRef.current.has(key)) {
             setActivePrayer({ name, time, minutesIn: Math.floor(diff / 60000) });
+
             const msUntilEnd = start + POPUP_WINDOW_MS - nowMs;
-            console.log(`[DEBUG] Showing ${name}, auto-hide in ${msUntilEnd}ms`);
             timerRef.current = setTimeout(() => {
               setActivePrayer(null);
               schedule();
@@ -119,12 +115,14 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
             return;
           }
 
+          // Dismissed — jump to next prayer
           const next = prayers[i + 1];
           if (next) {
             setActivePrayer(null);
             const msUntilNext = toMs(next.time) - nowMs;
-            console.log(`[DEBUG] ${name} dismissed, next: ${next.name} in ${msUntilNext}ms`);
-            if (msUntilNext > 0) timerRef.current = setTimeout(schedule, msUntilNext);
+            if (msUntilNext > 0) {
+              timerRef.current = setTimeout(schedule, msUntilNext);
+            }
           } else {
             setActivePrayer(null);
           }
@@ -133,25 +131,22 @@ export function PrayerNotifProvider({ children }: { children: React.ReactNode })
 
         if (diff < 0) {
           setActivePrayer(null);
-          console.log(`[DEBUG] Waiting ${-diff}ms for ${name}`);
           timerRef.current = setTimeout(schedule, -diff);
           return;
         }
       }
 
       setActivePrayer(null);
-      console.log("[DEBUG] All prayers passed");
     }
 
     scheduleRef.current = schedule;
     schedule();
 
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [isReady]);
+  }, [data, isReady]); // re-runs once isReady flips to true
 
   const dismissPrayer = useCallback((name: PrayerName) => {
     const key = `${name}-${new Date().toDateString()}`;
-    console.log(`[DEBUG] Dismissed: ${name}`);
     dismissedRef.current.add(key);
     setActivePrayer(null);
     scheduleRef.current();
