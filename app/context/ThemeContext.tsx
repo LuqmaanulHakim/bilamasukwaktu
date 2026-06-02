@@ -24,6 +24,8 @@ interface ThemeContextValue {
   setAccent: (color: AccentColor) => void;
   showCountdown: boolean;
   toggleCountdown: () => void;
+  showPopup: boolean;
+  togglePopup: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
@@ -33,6 +35,8 @@ const ThemeContext = createContext<ThemeContextValue>({
   setAccent: () => {},
   showCountdown: true,
   toggleCountdown: () => {},
+  showPopup: true,
+  togglePopup: () => {},
 });
 
 function applyAccent(accent: AccentColor, theme: Theme) {
@@ -56,6 +60,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   const [accent, setAccentState] = useState<AccentColor>("indigo");
   const [showCountdown, setShowCountdown] = useState<boolean>(true);
+  const [showPopup, setShowPopup] = useState<boolean>(true);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") as Theme | null;
@@ -66,6 +71,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const initialTheme: Theme = storedTheme ?? preferred;
     const initialAccent: AccentColor = storedAccent ?? "indigo";
     const initialCountdown: boolean  = storedCountdown === null ? true : storedCountdown === "true";
+
+    const storedPopup = localStorage.getItem("showPopup");
+    const initialPopup: boolean = storedPopup === null ? true : storedPopup === "true";
+
+    setShowPopup(initialPopup);
 
     setTheme(initialTheme);
     setAccentState(initialAccent);
@@ -98,8 +108,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const togglePopup = () => {
+    setShowPopup((prev) => {
+      const next = !prev;
+      localStorage.setItem("showPopup", String(next));
+      return next;
+    });
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown}}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown, showPopup, togglePopup }}>
       {children}
     </ThemeContext.Provider>
   );
