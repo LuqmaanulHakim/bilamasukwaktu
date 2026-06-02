@@ -24,8 +24,6 @@ interface ThemeContextValue {
   setAccent: (color: AccentColor) => void;
   showCountdown: boolean;
   toggleCountdown: () => void;
-  showPrayerPopup: boolean;
-  togglePrayerPopup: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
@@ -35,8 +33,6 @@ const ThemeContext = createContext<ThemeContextValue>({
   setAccent: () => {},
   showCountdown: true,
   toggleCountdown: () => {},
-  showPrayerPopup: true,
-  togglePrayerPopup: () => {},
 });
 
 function applyAccent(accent: AccentColor, theme: Theme) {
@@ -60,24 +56,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   const [accent, setAccentState] = useState<AccentColor>("indigo");
   const [showCountdown, setShowCountdown] = useState<boolean>(true);
-  const [showPrayerPopup, setShowPrayerPopup] = useState<boolean>(true);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") as Theme | null;
     const storedAccent = localStorage.getItem("accent") as AccentColor | null;
     const storedCountdown = localStorage.getItem("showCountdown");
-    const storedPrayerPopup = localStorage.getItem("showPrayerPopup");
     const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
     const initialTheme: Theme = storedTheme ?? preferred;
     const initialAccent: AccentColor = storedAccent ?? "indigo";
     const initialCountdown: boolean  = storedCountdown === null ? true : storedCountdown === "true";
-    const initialPrayerPopup: boolean = storedPrayerPopup === null ? true : storedPrayerPopup === "true";
 
     setTheme(initialTheme);
     setAccentState(initialAccent);
     setShowCountdown(initialCountdown);
-    setShowPrayerPopup(initialPrayerPopup);
     document.documentElement.setAttribute("data-theme", initialTheme);
     applyAccent(initialAccent, initialTheme);
   }, []);
@@ -106,16 +98,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const togglePrayerPopup = () => {
-    setShowPrayerPopup((prev) => {
-      const next = !prev;
-      localStorage.setItem("showPrayerPopup", String(next));
-      return next;
-    });
-  };
-
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown, showPrayerPopup, togglePrayerPopup}}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown}}>
       {children}
     </ThemeContext.Provider>
   );
