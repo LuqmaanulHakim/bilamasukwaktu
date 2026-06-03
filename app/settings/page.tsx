@@ -8,7 +8,6 @@ import { useTheme } from "../context/ThemeContext";
 import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle, BellRing } from "lucide-react";
 import { ACCENT_COLORS } from "../context/ThemeContext";
 import type { AccentColor } from "../context/ThemeContext";
-import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
   const { zones, loading: zonesLoading } = useZones();
@@ -20,7 +19,6 @@ export default function SettingsPage() {
   const isLocating = gpsStatus === "locating";
   const isSuccess = gpsStatus === "success";
   const isError = gpsStatus === "error";
-  const router = useRouter();
 
   return (
     <main className="w-full max-w-md mx-auto min-h-screen px-4 py-4 pb-24 space-y-5">
@@ -267,7 +265,6 @@ export default function SettingsPage() {
             })}
           </div>
         </div>
-        <button onClick={() => router.push("/kiblat")} className="text-sm font-medium" style={{ color: "var(--accent)" }}>Kiblat</button>
       </section>
     </main>
   );
