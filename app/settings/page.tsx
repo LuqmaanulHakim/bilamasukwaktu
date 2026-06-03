@@ -5,14 +5,14 @@ import { useZones } from "../hooks/useZones";
 import { useSelectedZone } from "../hooks/useSelectedZone";
 import { useGpsZone } from "../hooks/useGpsZone";
 import { useTheme } from "../context/ThemeContext";
-import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle, BellRing, Info } from "lucide-react";
+import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle, BellRing } from "lucide-react";
 import { ACCENT_COLORS } from "../context/ThemeContext";
 import type { AccentColor } from "../context/ThemeContext";
 
 export default function SettingsPage() {
   const { zones, loading: zonesLoading } = useZones();
   const { zone, setZone } = useSelectedZone();
-  const { theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown, showPopup, togglePopup } = useTheme();
+  const { theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown } = useTheme();
   const { status: gpsStatus, error: gpsError, detected, locate } = useGpsZone();
   const isDark = theme === "dark";
 
@@ -26,48 +26,6 @@ export default function SettingsPage() {
       <section>
         <h1 className="text-2xl font-bold mt-1">Tetapan</h1>
         <p className="mt-1 text-sm opacity-80">Sesuaikan mengikut tetapan anda</p>
-      </section>
-
-      {/* TESTING NOTICE */}
-      <section
-        className="rounded-2xl shadow-sm border p-4"
-        style={{
-          background: isDark ? "#2d0a0a" : "#fef2f2",
-          borderColor: isDark ? "#7f1d1d" : "#fecaca",
-        }}
-      >
-        <div className="flex items-start gap-3">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-            style={{
-              background: isDark ? "#450a0a" : "#fee2e2",
-            }}
-          >
-            <Info
-              size={16}
-              className={isDark ? "text-red-300" : "text-red-600"}
-            />
-          </div>
-
-          <div>
-            <p
-              className="text-sm font-semibold"
-              style={{ color: isDark ? "#fca5a5" : "#b91c1c" }}
-            >
-              Mod Ujian
-            </p>
-
-            <p
-              className="text-xs mt-1 leading-relaxed"
-              style={{ color: isDark ? "#fecaca" : "#7f1d1d" }}
-            >
-              Fungsi <strong>Papar Waktu Solat</strong> kini berada dalam{" "}
-              <strong>mod ujian (testing mode)</strong>. Ketepatan dan kestabilan
-              fungsi ini sedang dipantau dan akan dipertingkatkan dalam kemas kini
-              akan datang.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* ZONE SELECTOR */}
@@ -223,28 +181,6 @@ export default function SettingsPage() {
             <span
               className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-300"
               style={{ transform: showCountdown ? "translateX(24px)" : "translateX(0)" }}
-            />
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
-              Popup Waktu Solat
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-              {showPopup ? "Papar tetingkap masuk waktu" : "Disembunyikan"}
-            </p>
-          </div>
-          <button
-            onClick={togglePopup}
-            aria-label="Toggle prayer popup"
-            className="relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            style={{ background: showPopup ? "var(--accent)" : "var(--card-border)" }}
-          >
-            <span
-              className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-300"
-              style={{ transform: showPopup ? "translateX(24px)" : "translateX(0)" }}
             />
           </button>
         </div>

@@ -5,7 +5,6 @@ import DisableZoom from "./components/DisableZoom";
 import BottomNav from "./components/BottomNav";
 import { ThemeProvider } from "./context/ThemeContext";
 import SplashScreen from "./components/SplashScreen";
-import PrayerPopupProvider from "./components/PrayerPopupProvider";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -43,7 +42,6 @@ export default function RootLayout({
           <DisableZoom />
           <SplashScreen />
           {children}
-          <PrayerPopupProvider />
           <BottomNav />
         </ThemeProvider>
       </body>
