@@ -88,10 +88,11 @@ export default function KiblatPage() {
     }
 
     // --- Alignment glow ---
-    // Use the remaining gap to target (not the lerp step) so it only
-    // triggers when the needle is truly close to the qibla direction
-    const remainingGap = Math.abs(angleDiff(smoothNeedleAngle.current % 360, needleTarget));
-    const newState = remainingGap < 5 ? "aligned" : remainingGap < 20 ? "almost" : "none";
+    // needleTarget is already (qibla - heading) in 0–360.
+    // When the user faces qibla, needleTarget === 0 (needle points up).
+    // So measure how far needleTarget is from 0°.
+    const fromUp = needleTarget > 180 ? 360 - needleTarget : needleTarget;
+    const newState = fromUp < 5 ? "aligned" : fromUp < 20 ? "almost" : "none";
     setAlignState(prev => prev !== newState ? newState : prev);
     if (glowRef.current) {
       glowRef.current.style.opacity = newState === "aligned" ? "0.15" : newState === "almost" ? "0.07" : "0";
