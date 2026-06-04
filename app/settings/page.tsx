@@ -9,6 +9,7 @@ import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle, BellRing } 
 import { ACCENT_COLORS } from "../context/ThemeContext";
 import type { AccentColor } from "../context/ThemeContext";
 import { useRouter } from "next/navigation";
+import LoginButton from "../components/LoginButton";
 
 export default function SettingsPage() {
   const { zones, loading: zonesLoading } = useZones();
@@ -268,6 +269,7 @@ export default function SettingsPage() {
           </div>
         </div>
         <button onClick={() => router.push("/kiblat")} className="text-sm font-medium" style={{ color: "var(--accent)" }}>Kiblat</button>
+        <LoginButton /> {/* Add the login button here */}
       </section>
     </main>
   );
