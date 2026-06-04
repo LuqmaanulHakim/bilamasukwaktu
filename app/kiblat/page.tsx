@@ -92,7 +92,7 @@ export default function KiblatPage() {
     // When the user faces qibla, needleTarget === 0 (needle points up).
     // So measure how far needleTarget is from 0°.
     const fromUp = needleTarget > 180 ? 360 - needleTarget : needleTarget;
-    const newState = fromUp < 3 ? "aligned" : fromUp < 20 ? "almost" : "none";
+    const newState = fromUp < 2 ? "aligned" : fromUp < 20 ? "almost" : "none";
     setAlignState(prev => prev !== newState ? newState : prev);
     if (glowRef.current) {
       glowRef.current.style.opacity = newState === "aligned" ? "0.15" : newState === "almost" ? "0.07" : "0";
