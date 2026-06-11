@@ -5,15 +5,90 @@ import { useZones } from "../hooks/useZones";
 import { useSelectedZone } from "../hooks/useSelectedZone";
 import { useGpsZone } from "../hooks/useGpsZone";
 import { useTheme } from "../context/ThemeContext";
-import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle, BellRing } from "lucide-react";
+import { TEXTURES } from "../context/ThemeContext";
+import type { Texture } from "../context/ThemeContext";
+import { Moon, Sun, LocateFixed, Loader2, CheckCircle2, AlertCircle, BellRing, Layers } from "lucide-react";
 import { ACCENT_COLORS } from "../context/ThemeContext";
 import type { AccentColor } from "../context/ThemeContext";
 import { useRouter } from "next/navigation";
 
+// ─── Texture swatch mini preview ─────────────────────────────────────────────
+
+function TextureSwatch({ id, isDark }: { id: Texture; isDark: boolean }) {
+  const stroke = isDark ? "rgba(129,140,248,0.22)" : "rgba(99,102,241,0.18)";
+  const bg = isDark ? "#1e293b" : "#eef2ff";
+
+  return (
+    <div
+      style={{
+        width: 52,
+        height: 52,
+        borderRadius: 10,
+        overflow: "hidden",
+        background: bg,
+        flexShrink: 0,
+      }}
+    >
+      <svg width="52" height="52" xmlns="http://www.w3.org/2000/svg">
+        {id === "circle" && (
+          <>
+            <defs>
+              <pattern id="sw-circle" width="16" height="16" patternUnits="userSpaceOnUse">
+                <circle cx="8" cy="8" r="4" fill="none" stroke={stroke} strokeWidth="1.2" />
+              </pattern>
+            </defs>
+            <rect width="52" height="52" fill="url(#sw-circle)" />
+          </>
+        )}
+        {id === "wave" && (
+          <>
+            <defs>
+              <pattern id="sw-wave" width="32" height="12" patternUnits="userSpaceOnUse">
+                <path d="M0 6 Q8 0 16 6 Q24 12 32 6" fill="none" stroke={stroke} strokeWidth="1.2" />
+              </pattern>
+            </defs>
+            <rect width="52" height="52" fill="url(#sw-wave)" />
+          </>
+        )}
+        {id === "plain" && (
+          <line x1="16" y1="26" x2="36" y2="26" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" />
+        )}
+        {id === "dot" && (
+          <>
+            <defs>
+              <pattern id="sw-dot" width="12" height="12" patternUnits="userSpaceOnUse">
+                <circle cx="6" cy="6" r="1.8" fill={stroke} />
+              </pattern>
+            </defs>
+            <rect width="52" height="52" fill="url(#sw-dot)" />
+          </>
+        )}
+        {id === "zigzag" && (
+          <>
+            <defs>
+              <pattern id="sw-zigzag" width="20" height="12" patternUnits="userSpaceOnUse">
+                <path
+                  d="M0 10 L5 2 L10 10 L15 2 L20 10"
+                  fill="none"
+                  stroke={stroke}
+                  strokeWidth="1.2"
+                />
+              </pattern>
+            </defs>
+            <rect width="52" height="52" fill="url(#sw-zigzag)" />
+          </>
+        )}
+      </svg>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function SettingsPage() {
   const { zones, loading: zonesLoading } = useZones();
   const { zone, setZone } = useSelectedZone();
-  const { theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown } = useTheme();
+  const { theme, toggleTheme, accent, setAccent, showCountdown, toggleCountdown, texture, setTexture } = useTheme();
   const { status: gpsStatus, error: gpsError, detected, locate } = useGpsZone();
   const isDark = theme === "dark";
 
@@ -148,11 +223,11 @@ export default function SettingsPage() {
         </button>
       </section>
 
+      {/* NOTIFICATIONS */}
       <section
         className="rounded-2xl shadow-sm border p-5 space-y-4"
         style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
       >
-        {/* Section header */}
         <div className="flex items-center gap-2">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
@@ -166,7 +241,6 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Countdown toggle */}
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Kiraan Detik</p>
@@ -202,7 +276,7 @@ export default function SettingsPage() {
           </div>
           <div>
             <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>Mod Tatapan</p>
-            <p className="text-xs" style={{ color: "var(--muted)" }}>Pilih antara mod gelap atau terang</p>
+            <p className="text-xs" style={{ color: "var(--muted)" }}>Pilih mengikut kesesuaian anda</p>
           </div>
         </div>
 
@@ -267,7 +341,46 @@ export default function SettingsPage() {
             })}
           </div>
         </div>
-        <button onClick={() => router.push("/kiblat")} className="text-sm font-medium" style={{ color: "var(--accent)" }}>Kiblat</button>
+        <div>
+          <p className="text-sm" style={{ color: "var(--foreground)" }}>Tekstur Latar</p>
+          <p className="text-xs" style={{ color: "var(--muted)" }}>Pilih corak latar belakang</p>
+        </div>
+
+        <div className="grid grid-cols-5 gap-2">
+          {TEXTURES.map((t) => {
+            const isActive = texture === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTexture(t.id as Texture)}
+                aria-label={t.label}
+                title={t.label}
+                className="flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-150"
+                style={{
+                  border: "1.5px solid",
+                  borderColor: isActive ? "var(--accent)" : "var(--card-border)",
+                  background: isActive ? "var(--accent-subtle)" : "transparent",
+                }}
+              >
+                <TextureSwatch id={t.id} isDark={isDark} />
+                <span
+                  className="text-xs font-medium leading-none"
+                  style={{ color: isActive ? "var(--accent)" : "var(--muted)" }}
+                >
+                  {t.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={() => router.push("/kiblat")}
+          className="text-sm font-medium"
+          style={{ color: "var(--accent)" }}
+        >
+          Kiblat
+        </button>
       </section>
     </main>
   );
