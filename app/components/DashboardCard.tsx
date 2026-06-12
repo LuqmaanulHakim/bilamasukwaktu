@@ -18,14 +18,10 @@ const dailyZikir: Record<string, string> = {
   Ahad: "يَا حَيُّ يَا قَيُّومُ",
 };
 
-// Map negeri names to image filenames
 const negeriImageMap: Record<string, string> = {
   "Johor": "Johor",
   "Kedah": "Kedah",
   "Kelantan": "Kelantan",
-  "Wilayah Persekutuan Kuala Lumpur": "KualaLumpur",
-  "Putrajaya": "KualaLumpur",
-  "Wilayah Persekutuan": "Labuan",
   "Negeri Sembilan": "NegeriSembilan",
   "Pahang": "Pahang",
   "Perak": "Perak",
@@ -34,21 +30,34 @@ const negeriImageMap: Record<string, string> = {
   "Sarawak": "Sarawak",
   "Selangor": "Selangor",
   "Terengganu": "Terengganu",
-  "Melaka": "Melaka",
 };
 
-function getNegeriImage(negeri?: string): string | null {
+function getWilayahImage(daerah?: string): string | null {
+  if (!daerah) return null;
+  const d = daerah.toLowerCase();
+  if (d.includes("labuan")) return "/negeri/Labuan.png";
+  if (d.includes("putrajaya") || d.includes("kuala lumpur")) return "/negeri/KualaLumpur.png";
+  return null;
+}
+
+function getNegeriImage(negeri?: string, daerah?: string): string | null {
   if (!negeri) return null;
-  if (negeriImageMap[negeri]) return `/negeri/${negeriImageMap[negeri]}.png`;
-  const key = Object.keys(negeriImageMap).find((k) =>
-    negeri.toLowerCase().includes(k.toLowerCase()) ||
-    k.toLowerCase().includes(negeri.toLowerCase())
+
+  const n = negeri.toLowerCase();
+
+  if (n.includes("wilayah persekutuan") || n.includes("w.p.")) {
+    return getWilayahImage(daerah);
+  }
+
+  const key = Object.keys(negeriImageMap).find(
+    (k) => k.toLowerCase() === n
   );
   return key ? `/negeri/${negeriImageMap[key]}.png` : null;
 }
 
 export default function DashboardCard({ selectedZone, getMalayDate }: Props) {
   const [now, setNow] = useState(() => new Date());
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     const scheduleNextDay = () => {
@@ -71,7 +80,12 @@ export default function DashboardCard({ selectedZone, getMalayDate }: Props) {
 
   const currentDay = now.toLocaleDateString("ms-MY", { weekday: "long" });
   const zikirText = dailyZikir[currentDay];
-  const negeriImage = getNegeriImage(selectedZone?.negeri);
+  const negeriImage = getNegeriImage(selectedZone?.negeri, selectedZone?.daerah);
+
+  // Reset fade-in whenever the image source changes
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [negeriImage]);
 
   return (
     <section
@@ -103,8 +117,18 @@ export default function DashboardCard({ selectedZone, getMalayDate }: Props) {
 
       {/* Header */}
       <div className="relative z-10">
-        <h2 className="text-white text-xl font-bold">{selectedZone?.negeri}</h2>
-        <p className="text-white/70 text-sm mt-1">{selectedZone?.daerah || "Prayer Times"}</p>
+        <h2 className="text-white text-xl font-bold">
+          {selectedZone?.negeri?.toLowerCase().includes("wilayah persekutuan") ||
+          selectedZone?.negeri?.toLowerCase().includes("w.p.")
+            ? selectedZone?.daerah
+            : selectedZone?.negeri}
+        </h2>
+        <p className="text-white/70 text-sm mt-1">
+          {selectedZone?.negeri?.toLowerCase().includes("wilayah persekutuan") ||
+          selectedZone?.negeri?.toLowerCase().includes("w.p.")
+            ? selectedZone?.negeri
+            : selectedZone?.daerah || "Prayer Times"}
+        </p>
         <p className="text-white text-sm font-semibold mt-1">{getMalayDate(now)}</p>
       </div>
 
@@ -128,7 +152,9 @@ export default function DashboardCard({ selectedZone, getMalayDate }: Props) {
             src={negeriImage}
             alt={selectedZone?.negeri ?? ""}
             fill
-            className="object-contain object-right opacity-75"
+            className="object-contain object-right transition-opacity duration-700"
+            style={{ opacity: imageLoaded ? 0.75 : 0 }}
+            onLoad={() => setImageLoaded(true)}
             priority
           />
         </div>
