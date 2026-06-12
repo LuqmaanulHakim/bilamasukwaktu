@@ -30,6 +30,7 @@ const negeriImageMap: Record<string, string> = {
   "Sarawak": "Sarawak",
   "Selangor": "Selangor",
   "Terengganu": "Terengganu",
+  "Melaka": "Melaka",
 };
 
 function getWilayahImage(daerah?: string): string | null {
