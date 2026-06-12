@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 type Props = {
   selectedZone: any;
@@ -16,6 +17,35 @@ const dailyZikir: Record<string, string> = {
   Sabtu: "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ",
   Ahad: "يَا حَيُّ يَا قَيُّومُ",
 };
+
+// Map negeri names to image filenames
+const negeriImageMap: Record<string, string> = {
+  "Johor": "Johor",
+  "Kedah": "Kedah",
+  "Kelantan": "Kelantan",
+  "Wilayah Persekutuan Kuala Lumpur": "KualaLumpur",
+  "Putrajaya": "KualaLumpur",
+  "Wilayah Persekutuan": "Labuan",
+  "Negeri Sembilan": "NegeriSembilan",
+  "Pahang": "Pahang",
+  "Perak": "Perak",
+  "Pulau Pinang": "PulauPinang",
+  "Sabah": "Sabah",
+  "Sarawak": "Sarawak",
+  "Selangor": "Selangor",
+  "Terengganu": "Terengganu",
+  "Melaka": "Melaka",
+};
+
+function getNegeriImage(negeri?: string): string | null {
+  if (!negeri) return null;
+  if (negeriImageMap[negeri]) return `/negeri/${negeriImageMap[negeri]}.png`;
+  const key = Object.keys(negeriImageMap).find((k) =>
+    negeri.toLowerCase().includes(k.toLowerCase()) ||
+    k.toLowerCase().includes(negeri.toLowerCase())
+  );
+  return key ? `/negeri/${negeriImageMap[key]}.png` : null;
+}
 
 export default function DashboardCard({ selectedZone, getMalayDate }: Props) {
   const [now, setNow] = useState(() => new Date());
@@ -41,6 +71,7 @@ export default function DashboardCard({ selectedZone, getMalayDate }: Props) {
 
   const currentDay = now.toLocaleDateString("ms-MY", { weekday: "long" });
   const zikirText = dailyZikir[currentDay];
+  const negeriImage = getNegeriImage(selectedZone?.negeri);
 
   return (
     <section
@@ -89,6 +120,19 @@ export default function DashboardCard({ selectedZone, getMalayDate }: Props) {
           {zikirText}
         </h1>
       </div>
+
+      {/* State Image — only rendered if a matching image exists */}
+      {negeriImage && (
+        <div className="absolute -right-20 top-1/2 -translate-y-20 w-52 h-52 pointer-events-none">
+          <Image
+            src={negeriImage}
+            alt={selectedZone?.negeri ?? ""}
+            fill
+            className="object-contain object-right opacity-75"
+            priority
+          />
+        </div>
+      )}
     </section>
   );
 }
